@@ -7,5 +7,5 @@ Text to Slideshow Generator a simple Python tool for video presentation generati
 ## Run Flask
 `flask run`
 
-## Open Web Browser
+## Open in Web Browser
 `http://127.0.0.1:5000`
