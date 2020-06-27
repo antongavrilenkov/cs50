@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home page
+{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+    <div style="justify-content: center;" class="row flex-xl-nowrap">
+    <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">  
+            <form method="POST">  
+                <h1 class="bd-title" >Text to Slideshow Generator</h1>     
+                <div id="slides" class="slides"> 
+                </div> 
+                <button id="add-new-slide" type="button" class="btn btn-default">Add New</button><br><br>
+                <div class="form-group row">
+                    <label for="staticEmail" class="col-sm-2 col-form-label">Format</label>
+                    <div class="col-sm-10">
+                        <select name="video_format" class="form-control">
+                            <option value="instagram">Instagram / 1080 x 1080 pixels</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="staticEmail" class="col-sm-2 col-form-label">Audio</label>
+                    <div class="col-sm-10">
+                        <select name="bg_music" class="form-control">
+                            <option value="Safety_Net">Safety Net</option>
+                            <option value="Carol_of_the_Bells">Carol of the Bells</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="staticEmail" class="col-sm-2 col-form-label">Slide duration</label>
+                    <div class="col-sm-10">
+                        <select name="slide_duration" class="form-control">
+                            <option value="5">5 sec</option>
+                            <option value="10">10 sec</option>
+                            <option value="20">20 sec</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-center"> 
+                    <button id="add-new-slide" type="submit" class="btn btn-primary">Download Slideshow Video</button>
+                </div>
+            </form>  
+      </main>
+    </div>
+</div> 
+<template>
+    <div class="slide">
+        <div class="slide__wrap">
+            <div class="slide__left">
+                <div class="input-group mb-3"> 
+                    <input type="text" name="text[]" class="form-control slide__text" placeholder="Slide text" aria-label="Slide text" aria-describedby="basic-addon1">
+                    <input type="color" name="text_color[]" class="form-control slide__color slide__color--text" title="Slide text color">
+                    <input type="color" name="bg_color[]" value="#dbf4ff" class="form-control slide__color slide__color--bg" title="Slide background color">
+                    <div class="input-group-append"> 
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split slide__action-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 
+                            <span class="sr-only">Action</span>
+                        </button>
+                        <div class="dropdown-menu">
+                        <a onclick="if (document.querySelectorAll('.slide').length > 1) {this.closest('.slide').remove()} else {alert('You must to have at least one slide')}" class="dropdown-item" href="#">Delete</a> 
+                        </div>
+                    </div>  
+                </div>  
+            </div>  
+        </div>
+    </div>
+</template>
+<script>  
+    var addNewSlide = function() {
+        if (document.querySelectorAll('.slide').length == 15) {
+            alert('You can have 15 slides maximum')
+        } else {
+            var slides = document.getElementById('slides');
+            var temp = document.getElementsByTagName("template")[0];
+            var clon = temp.content.cloneNode(true);
+            slides.appendChild(clon);
+        } 
+    }   
+
+    var addSlideButton = document.getElementById('add-new-slide');
+    addSlideButton.addEventListener('click', addNewSlide)
+
+    addNewSlide();
+</script>
+
+{% endblock %}

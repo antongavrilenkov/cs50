@@ -1,0 +1,59 @@
+main .form-control
+{
+    /* center form controls */
+    display: inline-block;
+
+    /* override Bootstrap's 100% width for form controls */
+    width: auto;
+}
+
+main
+{
+    /* scroll horizontally as needed */
+    overflow-x: auto; 
+}
+
+main img
+{
+    /* constrain images on small screens */
+    max-width: 100%;
+}
+
+main table {
+    text-align: left;
+}
+
+.main-container {
+    padding: 2.5rem 0;
+}
+
+.slide__color {
+    max-width: 46px;
+    border-radius: 0;
+}
+
+.slide__color:before { 
+    color: #495057;
+    position: absolute;
+    font-size: 9px;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.slide__color--text:before {
+    content: 'text'; 
+}
+
+.slide__color--bg:before {
+    content: 'bg'; 
+}
+
+.slide__action-btn {
+    border-color: #ced4da;
+}
+
+.slide__left {
+    display: flex;
+}  
