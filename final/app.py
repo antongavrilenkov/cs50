@@ -2,11 +2,14 @@
 Import modules
 """
 import shutil
-from flask import Flask, render_template, request, send_file
+from flask import Flask, flash, jsonify, redirect, render_template, request, session
+from flask_session import Session
+from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from generator import generator
+from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology
+from helpers import apology, login_required, usd, timestrftime
 
 # Configure application
 app = Flask(__name__)
@@ -22,6 +25,16 @@ def after_request(response):
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
     return response
+
+
+# Configure session to use filesystem (instead of signed cookies)
+app.config["SESSION_FILE_DIR"] = mkdtemp()
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+
+# Configure CS50 Library to use SQLite database
+db = SQL("sqlite:///finance.db")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -55,6 +68,15 @@ def index():
             print(str(exception_obj))
     else:
         return render_template("index.html", **locals())
+
+
+@app.route("/slideshows")
+@login_required
+def history():
+    """Show history of transactions"""
+    history_records = db.execute("SELECT * FROM history WHERE user_id = :user_id ORDER BY transacted DESC",
+                                 user_id=session["user_id"])
+    return render_template("slideshows.html", **locals())
 
 
 def errorhandler(error_obj):
