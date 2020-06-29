@@ -9,7 +9,8 @@
     <div style="justify-content: center;" class="row flex-xl-nowrap">
     <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">  
             <form method="POST">  
-                <h1 class="bd-title" >Slides</h1>     
+                <h1 class="bd-title" >Slides</h1> 
+                <p class="small">100 symbols per slide maximum</p>    
                 <div id="slides" class="slides"> 
                 </div> 
                 <button id="add-new-slide" type="button" class="btn btn-default">Add New</button><br><br>
@@ -53,7 +54,7 @@
         <div class="slide__wrap">
             <div class="slide__left">
                 <div class="input-group mb-3"> 
-                    <input required type="text" name="text[]" class="form-control slide__text" placeholder="Slide text" aria-label="Slide text" aria-describedby="basic-addon1">
+                    <input required type="text" maxlength="100" name="text[]" class="form-control slide__text" placeholder="Slide text" aria-label="Slide text" aria-describedby="basic-addon1">
                     <input type="color" name="text_color[]" class="form-control slide__color slide__color--text" title="Slide text color">
                     <input type="color" name="bg_color[]" value="#dbf4ff" class="form-control slide__color slide__color--bg" title="Slide background color">
                     <div class="input-group-append"> 

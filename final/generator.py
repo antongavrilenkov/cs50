@@ -16,7 +16,7 @@ def prepare_slide_text(text):
     while True: 
         # Return result after the end of the line reached
         if trav > len(text) - 1:
-            result += text[start:previous_word_end_idx] 
+            result += text[start:trav] 
             return result
         # Track index of the end of previous word
         if text[trav] == ' ' or (previous_word_end_idx == 0 and trav > len(text) - 2):
@@ -24,8 +24,8 @@ def prepare_slide_text(text):
         # Insert line break
         if chars_since_last_break > max_char_in_line:
             result += text[start:previous_word_end_idx] + "\n"
-            start = previous_word_end_idx + 1
-            trav = previous_word_end_idx + 1
+            start = previous_word_end_idx
+            trav = previous_word_end_idx
             chars_since_last_break = 0
         # Traverse the next character
         else:

@@ -1,29 +1,29 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    History
+    My Slides
 {% endblock %}
 
 {% block main %}
-    {% if slideshows %}
+    {% if slides %}
         <ul class="list-group">
-            {% for slideshow in slideshows %} 
+            {% for slide in slides %} 
             <li class="list-group-item d-lg-flex d-md-flex d-sm-flex justify-content-between align-items-center">
-                {{ slideshow["created"] }}
+                {{ slide["created"] }}
                 <br>
                 <span>
-                    <button data-id="{{ slideshow["slide_id"] }}" type="button" class="btn btn-primary btn-sm slideshow__action-button--show">Show Details</button>
-                    <button data-id="{{ slideshow["slide_id"] }}" type="button" class="btn btn-primary btn-sm slideshow__action-button--download">Download</button>
-                    <form class="slideshow__delete-form d-inline" action="/slideshows/delete/{{ slideshow["slide_id"] }}">
-                        <button data-id="{{ slideshow["slide_id"] }}" type="button" class="btn btn-danger btn-sm slideshow__action-button--delete">Delete</button>
+                    <button data-id="{{ slide["slide_id"] }}" type="button" class="btn btn-primary btn-sm my-slides__action-button--show">Show Details</button>
+                    <button data-id="{{ slide["slide_id"] }}" type="button" class="btn btn-primary btn-sm my-slides__action-button--download">Download</button>
+                    <form class="my-slides__delete-form d-inline" action="/my-slides/delete/{{ slide["slide_id"] }}">
+                        <button data-id="{{ slide["slide_id"] }}" type="button" class="btn btn-danger btn-sm my-slides__action-button--delete">Delete</button>
                     </form>
                 </span> 
             </li>   
-            <div id="slideshow__detail-block--{{ slideshow["slide_id"] }}" class="slideshow__detail-block d-none list-group-item">
+            <div id="my-slides__detail-block--{{ slide["slide_id"] }}" class="my-slides__detail-block d-none list-group-item">
                 Slides:<br>
-                {% for data in slideshow["slides_data"] %}
+                {% for data in slide["slides_data"] %}
                     <strong>{{ data["slide_number"] + 1 }}:</strong> 
-                    {{ data["text"] }} <br>{% if loop.index < slideshow["slides_data"]|length - 1 %}<br>{% endif %}
+                    {{ data["text"] }} <br>{% if loop.index < slide["slides_data"]|length - 1 %}<br>{% endif %}
                 {% endfor %}
             </div>
             {% endfor %}
@@ -31,20 +31,20 @@
         <iframe id="my_iframe" style="display:none;"></iframe>
     {% endif %}
     <script>
-        var showDetailsButtons = document.querySelectorAll('.slideshow__action-button--show');
-        var downloadButtons = document.querySelectorAll('.slideshow__action-button--download');
-        var deleteButtons = document.querySelectorAll('.slideshow__action-button--delete');
+        var showDetailsButtons = document.querySelectorAll('.my-slides__action-button--show');
+        var downloadButtons = document.querySelectorAll('.my-slides__action-button--download');
+        var deleteButtons = document.querySelectorAll('.my-slides__action-button--delete');
 
         if (showDetailsButtons.length > 0) {
             showDetailsButtons.forEach(function(el) {
                 var slideId = el.dataset["id"]; 
                 el.addEventListener("click", function() {
                     if (!el.classList.contains('opened')) { 
-                        document.getElementById('slideshow__detail-block--' + slideId).classList.remove('d-none');
+                        document.getElementById('my-slides__detail-block--' + slideId).classList.remove('d-none');
                         el.classList.add('opened');
                         el.textContent = 'Hide Details';
                     } else {
-                        document.getElementById('slideshow__detail-block--' + slideId).classList.add('d-none');
+                        document.getElementById('my-slides__detail-block--' + slideId).classList.add('d-none');
                         el.classList.remove('opened');
                         el.textContent = 'Show Details';
                     }
@@ -60,11 +60,11 @@
             downloadButtons.forEach(function(el) {
                 var slideId = el.dataset["id"]; 
                 el.addEventListener("click", function() {
-                    Download('/slideshows/download/' + slideId);
-                    // fetch('/slideshows/download/' + slideId)
+                    Download('/my-slides/download/' + slideId);
+                    // fetch('/my-slides/download/' + slideId)
                     // .then(response => response.blob())
                     // .then(blob => {
-                    //     const file = new File([blob], 'slideshow.mp4', {type: blob.type, lastModified: Date.now()});
+                    //     const file = new File([blob], 'slide.mp4', {type: blob.type, lastModified: Date.now()});
                     // });
 
                 })
@@ -77,7 +77,7 @@
                 el.addEventListener("click", function() {
                     var r = confirm("Are you sure?");
                     if (r == true) {
-                       el.closest('.slideshow__delete-form').submit(); 
+                       el.closest('.my-slides__delete-form').submit(); 
                     }
                 })
             })

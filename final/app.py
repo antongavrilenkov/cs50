@@ -35,7 +35,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///slideshows.db")
+db = SQL("sqlite:///my-slides.db")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -57,7 +57,7 @@ def index():
                     'bg_color': bg_colors[idx],
                 })
  
-        # Save Slideshow's data to database
+        # Save slide's data to database
         if "user_id" in session: 
             slide_id = db.execute("INSERT INTO slides(user_id, video_format, bg_music, slide_duration) \
                               VALUES (:user_id, :video_format, :bg_music, :slide_duration)",
@@ -100,27 +100,29 @@ def index():
         return render_template("index.html", **locals())
 
 
-@app.route("/slideshows")
+@app.route("/my-slides")
 @login_required
-def slideshows():
+def my_slides():
     """Show history of transactions"""  
-    slides = db.execute("SELECT * FROM slides WHERE user_id = :user_id ORDER BY created DESC",
+    slides_response = db.execute("SELECT * FROM slides WHERE user_id = :user_id ORDER BY created DESC",
                          user_id=session["user_id"]) 
-    slideshows = []
-    for slide in slides:
+    print(slides_response)
+    slides = []
+    for slide in slides_response:
         slides_data = db.execute("SELECT * FROM slides_data WHERE slide_id = :slide_id ORDER BY slide_number ASC",
                                  slide_id=slide["id"]) 
 
-        slideshows.append({"slide_id": slide["id"],
+        slides.append({"slide_id": slide["id"],
                            "created": slide["created"],
                            "slides_data": slides_data})
+    print(slides)
 
-    return render_template("slideshows.html", **locals())
+    return render_template("my-slides.html", **locals())
 
 
-@app.route("/slideshows/download/<int:slide_id>")
+@app.route("/my-slides/download/<int:slide_id>")
 @login_required
-def slideshows_download(slide_id):
+def my_slides_download(slide_id):
     """Show history of transactions"""  
     slide = db.execute("SELECT * FROM slides WHERE id = :slide_id ORDER BY created DESC",
                          slide_id=slide_id)
@@ -157,12 +159,12 @@ def slideshows_download(slide_id):
         print(str(exception_obj))
 
     # Redirect to the home page
-    return redirect("/slideshows")
+    return redirect("/my-slides")
 
 
-@app.route("/slideshows/delete/<int:slide_id>")
+@app.route("/my-slides/delete/<int:slide_id>")
 @login_required
-def slideshows_delete(slide_id):
+def my_slides_delete(slide_id):
     """Show history of transactions"""
     # Delete slides from database  
     db.execute("DELETE FROM slides WHERE id = :id",
@@ -174,7 +176,7 @@ def slideshows_delete(slide_id):
     flash('Deleted!', 'success')
 
     # Redirect to the home page
-    return redirect("/slideshows")
+    return redirect("/my-slides")
 
 
 @app.route("/login", methods=["GET", "POST"])
