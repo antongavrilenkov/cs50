@@ -1,11 +1,14 @@
-# Slideshow Generator
-Slideshow Generator a simple Python tool for a video presentation generation.
+# Video Slides Generator
+Video Slides Generator a simple Python tool for a video presentation generation.
 
-## Installation
+## 1. Install FFmpeg
+https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg
+
+## 2. Install pip "Requirements files"
 `pip install -r requirements.txt`
 
-## Run Flask
+## 3. Start Flask Web Server
 `flask run`
 
-## Open in Web Browser
+## 4. Open Web Browser
 `http://127.0.0.1:5000`

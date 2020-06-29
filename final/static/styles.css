@@ -16,6 +16,10 @@ nav .navbar-brand .green
     color: #2e944b;
 }
 
+.navbar-nav {
+    margin-top: 0 !important;
+}
+
 main .form-control
 {
     /* center form controls */

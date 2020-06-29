@@ -5,28 +5,82 @@
 {% endblock %}
 
 {% block main %}
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Symbol</th>
-                <th>Shares</th>
-                <th>Price</th>
-                <th>Transacted</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if history_records %}
-                {% for record in history_records %}
-                    <tr>
-                        <td>{{ record["symbol"] }}</td>
-                        <td>{{ record["shares"] }}</td>
-                        <td>{{ record["price"] | usd }}</td>
-                        <td>{{ record["transacted"] | strftime }}</td>
-                        <td>{{ record["action"] }}</td>
-                    </tr>
+    {% if slideshows %}
+        <ul class="list-group">
+            {% for slideshow in slideshows %} 
+            <li class="list-group-item d-lg-flex d-md-flex d-sm-flex justify-content-between align-items-center">
+                {{ slideshow["created"] }}
+                <br>
+                <span>
+                    <button data-id="{{ slideshow["slide_id"] }}" type="button" class="btn btn-primary btn-sm slideshow__action-button--show">Show Details</button>
+                    <button data-id="{{ slideshow["slide_id"] }}" type="button" class="btn btn-primary btn-sm slideshow__action-button--download">Download</button>
+                    <form class="slideshow__delete-form d-inline" action="/slideshows/delete/{{ slideshow["slide_id"] }}">
+                        <button data-id="{{ slideshow["slide_id"] }}" type="button" class="btn btn-danger btn-sm slideshow__action-button--delete">Delete</button>
+                    </form>
+                </span> 
+            </li>   
+            <div id="slideshow__detail-block--{{ slideshow["slide_id"] }}" class="slideshow__detail-block d-none list-group-item">
+                Slides:<br>
+                {% for data in slideshow["slides_data"] %}
+                    <strong>{{ data["slide_number"] + 1 }}:</strong> 
+                    {{ data["text"] }} <br>{% if loop.index < slideshow["slides_data"]|length - 1 %}<br>{% endif %}
                 {% endfor %}
-            {% endif %}
-        </tbody>
-    </table>
+            </div>
+            {% endfor %}
+        </ul>
+        <iframe id="my_iframe" style="display:none;"></iframe>
+    {% endif %}
+    <script>
+        var showDetailsButtons = document.querySelectorAll('.slideshow__action-button--show');
+        var downloadButtons = document.querySelectorAll('.slideshow__action-button--download');
+        var deleteButtons = document.querySelectorAll('.slideshow__action-button--delete');
+
+        if (showDetailsButtons.length > 0) {
+            showDetailsButtons.forEach(function(el) {
+                var slideId = el.dataset["id"]; 
+                el.addEventListener("click", function() {
+                    if (!el.classList.contains('opened')) { 
+                        document.getElementById('slideshow__detail-block--' + slideId).classList.remove('d-none');
+                        el.classList.add('opened');
+                        el.textContent = 'Hide Details';
+                    } else {
+                        document.getElementById('slideshow__detail-block--' + slideId).classList.add('d-none');
+                        el.classList.remove('opened');
+                        el.textContent = 'Show Details';
+                    }
+                })
+            })
+        }
+
+        function Download(url) {
+            document.getElementById('my_iframe').src = url;
+        };
+
+        if (downloadButtons.length > 0) {
+            downloadButtons.forEach(function(el) {
+                var slideId = el.dataset["id"]; 
+                el.addEventListener("click", function() {
+                    Download('/slideshows/download/' + slideId);
+                    // fetch('/slideshows/download/' + slideId)
+                    // .then(response => response.blob())
+                    // .then(blob => {
+                    //     const file = new File([blob], 'slideshow.mp4', {type: blob.type, lastModified: Date.now()});
+                    // });
+
+                })
+            })
+        }
+
+        if (deleteButtons.length > 0) {
+            deleteButtons.forEach(function(el) {
+                var slideId = el.dataset["id"]; 
+                el.addEventListener("click", function() {
+                    var r = confirm("Are you sure?");
+                    if (r == true) {
+                       el.closest('.slideshow__delete-form').submit(); 
+                    }
+                })
+            })
+        }
+    </script>
 {% endblock %}

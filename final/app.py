@@ -3,7 +3,7 @@ Import modules
 """
 from cs50 import SQL
 import shutil
-from flask import Flask, flash, jsonify, redirect, render_template, request, session
+from flask import Flask, flash, jsonify, redirect, render_template, request, session, send_file
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
@@ -48,21 +48,50 @@ def index():
         bg_music = request.form.getlist("bg_music")
         slide_duration = request.form.getlist("slide_duration")
 
+        textsFiltered = []
+        for idx, text in enumerate(texts):
+            if text != '': 
+                textsFiltered.append({
+                    'text': text,
+                    'text_color': text_colors[idx],
+                    'bg_color': bg_colors[idx],
+                })
+ 
+        # Save Slideshow's data to database
+        if "user_id" in session: 
+            slide_id = db.execute("INSERT INTO slides(user_id, video_format, bg_music, slide_duration) \
+                              VALUES (:user_id, :video_format, :bg_music, :slide_duration)",
+                              user_id=session["user_id"], video_format=video_format,
+                              bg_music=bg_music, slide_duration=slide_duration) 
+
+            # Save each slide's data to database
+            for idx, text in enumerate(textsFiltered): 
+                rows = db.execute("INSERT INTO slides_data(slide_id, text, slide_number, text_color, bg_color) \
+                                VALUES (:slide_id, :text, :slide_number, :text_color, :bg_color)",
+                                slide_id=slide_id, text=text.get("text"), slide_number=idx,
+                                text_color=text.get("text_color"), bg_color=text.get("bg_color"))
+
+        # Generate video slides
         file_path = app.root_path + '/' + \
-                    generator({'texts': texts, 'text_colors': text_colors,
-                               'bg_colors': bg_colors, 'video_format': video_format[0],
+                    generator({'texts': textsFiltered, 'video_format': video_format[0],
                                'bg_music': bg_music[0], 'slide_duration': slide_duration[0]})
+ 
+        # Open generated video
         file_handle = open(file_path, 'r')
+
         try:
+            # Remove temporary files after request is processed
             @app.after_request
             def remove_file(response):
-                '''Delete temp folder and all files in temp folder'''
+                '''Delete temp folder and all included files'''
                 try:
                     shutil.rmtree('static/temp')
                     file_handle.close()
                 except Exception as error:
                     print("Error removing or closing downloaded file handle", error)
                 return response
+
+            # Return generated video to the browser
             return send_file(file_path, as_attachment=True, mimetype='video/mp4',
                              attachment_filename='slides.mp4')
         except Exception as exception_obj:
@@ -73,11 +102,79 @@ def index():
 
 @app.route("/slideshows")
 @login_required
-def history():
-    """Show history of transactions"""
-    history_records = db.execute("SELECT * FROM history WHERE user_id = :user_id ORDER BY transacted DESC",
-                                 user_id=session["user_id"])
+def slideshows():
+    """Show history of transactions"""  
+    slides = db.execute("SELECT * FROM slides WHERE user_id = :user_id ORDER BY created DESC",
+                         user_id=session["user_id"]) 
+    slideshows = []
+    for slide in slides:
+        slides_data = db.execute("SELECT * FROM slides_data WHERE slide_id = :slide_id ORDER BY slide_number ASC",
+                                 slide_id=slide["id"]) 
+
+        slideshows.append({"slide_id": slide["id"],
+                           "created": slide["created"],
+                           "slides_data": slides_data})
+
     return render_template("slideshows.html", **locals())
+
+
+@app.route("/slideshows/download/<int:slide_id>")
+@login_required
+def slideshows_download(slide_id):
+    """Show history of transactions"""  
+    slide = db.execute("SELECT * FROM slides WHERE id = :slide_id ORDER BY created DESC",
+                         slide_id=slide_id)
+    slide = slide[0]  
+    textsFiltered = []
+    slides_data = db.execute("SELECT * FROM slides_data WHERE slide_id = :slide_id",
+                                 slide_id=slide_id)
+    for data in slides_data: 
+        textsFiltered.append({
+            'text': data["text"],
+            'text_color': data["text_color"],
+            'bg_color': data["bg_color"],
+        }) 
+        
+    
+    file_path = app.root_path + '/' + \
+                generator({'texts': textsFiltered, 'video_format': slide["video_format"],
+                            'bg_music': slide["bg_music"], 'slide_duration': slide["slide_duration"]})
+    file_handle = open(file_path, 'r')
+
+    try:
+        @app.after_request
+        def remove_file(response):
+            '''Delete temp folder and all files in temp folder'''
+            try:
+                shutil.rmtree('static/temp')
+                file_handle.close()
+            except Exception as error:
+                print("Error removing or closing downloaded file handle", error)
+            return response
+        return send_file(file_path, as_attachment=True, mimetype='video/mp4',
+                            attachment_filename='slides.mp4')
+    except Exception as exception_obj:
+        print(str(exception_obj))
+
+    # Redirect to the home page
+    return redirect("/slideshows")
+
+
+@app.route("/slideshows/delete/<int:slide_id>")
+@login_required
+def slideshows_delete(slide_id):
+    """Show history of transactions"""
+    # Delete slides from database  
+    db.execute("DELETE FROM slides WHERE id = :id",
+                id=slide_id) 
+    db.execute("DELETE FROM slides_data WHERE slide_id = :slide_id",
+                slide_id=slide_id)
+
+    # Show success flash message
+    flash('Deleted!', 'success')
+
+    # Redirect to the home page
+    return redirect("/slideshows")
 
 
 @app.route("/login", methods=["GET", "POST"])

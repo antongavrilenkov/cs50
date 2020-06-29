@@ -6,28 +6,28 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 
 def prepare_slide_text(text):
-    '''Prepare text'''
+    '''Prepare text / Insert line breakes'''
     chars_since_last_break = 0
     max_char_in_line = 14
     previous_word_end_idx = 0
     start = 0
     trav = 0
     result = ''
-    while True:
-        print(str(trav) + ' ' + str(len(text)) + ' ' + str(start)
-              + ' ' + str(previous_word_end_idx))
+    while True: 
+        # Return result after the end of the line reached
         if trav > len(text) - 1:
-            result += text[start:previous_word_end_idx]
-            print('result')
-            print(result)
+            result += text[start:previous_word_end_idx] 
             return result
+        # Track index of the end of previous word
         if text[trav] == ' ' or (previous_word_end_idx == 0 and trav > len(text) - 2):
             previous_word_end_idx = trav + 1
+        # Insert line break
         if chars_since_last_break > max_char_in_line:
             result += text[start:previous_word_end_idx] + "\n"
             start = previous_word_end_idx + 1
             trav = previous_word_end_idx + 1
             chars_since_last_break = 0
+        # Traverse the next character
         else:
             trav += 1
             chars_since_last_break += 1
@@ -73,8 +73,7 @@ def create_slide(params):
 
 
 def generator(params):
-    '''Generate a video slideshow from text'''
-    print(params.get('texts'))
+    '''Generate a video slideshow from text''' 
     folder_name = str(uuid.uuid4())
     temp_folder = 'static/temp/'
     slide_folder = temp_folder + folder_name + '/'
@@ -89,30 +88,23 @@ def generator(params):
         print("Successfully created the directory %s " % slide_folder)
 
         # Create slide's image from text
-        slides_created = 0
+        slides_created = len(params.get("texts"))
         for idx, text in enumerate(params.get("texts")):
-            result = create_slide({'text': text, 'slide_folder': slide_folder,
-                                   'filename': str(slides_created),
-                                   'text_color': params.get("text_colors")[idx],
-                                   'bg_color': params.get("bg_colors")[idx]})
-            if result is not None:
-                slides_created += 1
+            create_slide({'text': text.get("text"), 'slide_folder': slide_folder,
+                          'filename': str(idx),
+                          'text_color': text.get("text_color"),
+                          'bg_color': text.get("bg_color")})  
 
-        print("slides_created:")
-        print(slides_created)
         # Convert images to output video
         os.system("ffmpeg -framerate 1/{1} -i {0}%d.png -r 25 -pix_fmt yuv420p {0}out.mp4"
                   .format(slide_folder, params.get("slide_duration")))
 
         # Add background music
         if params.get("bg_music") != "none":
-            video_duration = slides_created * int(params.get("slide_duration"))
-            print('add bg music')
-            print(video_duration)
+            video_duration = slides_created * int(params.get("slide_duration")) 
             os.system("mv {0}out.mp4 {0}tmp.mp4".format(slide_folder))
             os.system("cp static/audio/bg-music/{1}.mp3 {0}tmp.mp3"
-                      .format(slide_folder, params.get("bg_music")))
-            print(video_duration)
+                      .format(slide_folder, params.get("bg_music"))) 
             os.system("ffmpeg -i {0}tmp.mp3 -t {1} {0}out.mp3"
                       .format(slide_folder, video_duration))
             os.system("ffmpeg -i {0}tmp.mp4 -i {0}out.mp3 -shortest {0}out.mp4"
