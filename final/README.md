@@ -8,8 +8,8 @@ https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg
 ### 2. Install pip "Requirements files"
 `pip install -r requirements.txt`
 
-### 3. Start Flask Web Server
+### 3. Start Flask web server
 `flask run`
 
-### 4. Open Web Browser
+### 4. Open web browser
 `http://127.0.0.1:5000`
