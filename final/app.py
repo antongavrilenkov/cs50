@@ -37,6 +37,12 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///my-slides.db")
 
+@app.route("/presentation")
+def presentation(): 
+    '''Presentation Page'''
+    return render_template("presentation.html", **locals())
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     """Show portfolio of stocks"""
