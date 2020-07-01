@@ -2,6 +2,7 @@
 Import modules
 """
 from cs50 import SQL
+import os
 import shutil
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, send_file
 from flask_session import Session
@@ -90,11 +91,12 @@ def index():
             @app.after_request
             def remove_file(response):
                 '''Delete temp folder and all included files'''
-                try:
-                    shutil.rmtree('static/temp')
-                    file_handle.close()
-                except Exception as error:
-                    print("Error removing or closing downloaded file handle", error)
+                if os.path.exists('static/temp'):
+                    try:
+                        shutil.rmtree('static/temp')
+                        file_handle.close()
+                    except Exception as error:
+                        print("Error removing or closing downloaded file handle", error)
                 return response
 
             # Return generated video to the browser
@@ -153,11 +155,12 @@ def my_slides_download(slide_id):
         @app.after_request
         def remove_file(response):
             '''Delete temp folder and all files in temp folder'''
-            try:
-                shutil.rmtree('static/temp')
-                file_handle.close()
-            except Exception as error:
-                print("Error removing or closing downloaded file handle", error)
+            if os.path.exists('static/temp'):
+                try:
+                    shutil.rmtree('static/temp')
+                    file_handle.close()
+                except Exception as error:
+                    print("Error removing or closing downloaded file handle", error)
             return response
         return send_file(file_path, as_attachment=True, mimetype='video/mp4',
                             attachment_filename='slides.mp4')
@@ -262,7 +265,6 @@ def register():
         rows = db.execute("SELECT * FROM users WHERE username = :username",
                           username=request.form.get("username"))
 
-        user_id = None
         # Ensure username not exist
         if len(rows) == 1:
             return apology("Username already exists", 403)

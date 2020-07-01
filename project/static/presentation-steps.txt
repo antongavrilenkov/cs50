@@ -1,0 +1,38 @@
+1. Hello I'm Anton Gavrilenkov from New York and I'm going to present my Harvard CS50's Introduction to Computer Science final project. 
+
+2. I named it Video Slides Generator. It is a simple web-based application that can help people to generate simple video slides for Instagram. 
+
+3. I built it using a C-library FFmpeg, Python, JS, SQL and Twitter Bootstrap 4 framework.
+
+4. At the next step I'm going to show you how it works.
+
+5. Here is a user interface of the home page. 
+
+6. To build a slides video user should input text for each of its slides. Also user can pick text color and background color for each slide.
+
+7. After user finished with the text he can pick a video format. I've just implemented Instagram video format. It's possible to extended this functionality in the future.
+
+8. User also can pick a audio for the video presentation and slide duration. I added a few options that can be extended in the future as well.
+
+9. After you user picked all options video slides file can be generated and downloaded by pressing Download Slideshow Video button at the bottom.
+
+10. Here is a generated video. It works perfect.
+
+11. If user wants to have access to previosly generated videos he must create an account. He can do it at register page.
+
+12. So I'm going to create a demo user.
+
+13. After I registered a new user I have to login.
+
+14. You can see My Slides - a new menu in the top menu of the web app.
+
+15. Now I'm going to create a new slides video and show you how I can use it later.
+
+16. .... Talking about creating a new slides video ....
+
+17. Now I can go to My Slides in the future and see all created slides. I can see date when slides were created, I can see details about each slide, I can download its video or I can delete it. It's so simple.
+
+18. In the future I'm planing to add more features and more video formats to the application. Also I opensourced it on GitHub. Feel free to check its source code and text me if you have any questions.
+
+19. Thank you for listening. Goodbye. 
+
